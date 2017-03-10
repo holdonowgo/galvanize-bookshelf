@@ -51,6 +51,9 @@ router.route('/books/:id')
         knex('books')
             .where('id', req.params.id)
             .then((books) => {
+                if (!books[0]) {
+                    res.sendStatus(404);
+                }
                 let book = humps.camelizeKeys(books[0]);
                 res.status(200).json(book);
             })
@@ -59,29 +62,33 @@ router.route('/books/:id')
             });
     })
     .patch((req, res) => {
+        let book = {
+            id: req.params.id,
+            title: req.body.title,
+            author: req.body.author,
+            genre: req.body.genre,
+            description: req.body.description,
+            cover_url: req.body.coverUrl
+        };
         knex('books')
             .where('id', req.params.id)
-            .update({
-                title: req.body.title,
-                author: req.body.author,
-                genre: req.body.genre,
-                description: req.body.description,
-                cover_url: req.body.cover_url
-            })
-            .then((book) => {
-                res.status(200).json(book);
+            .update(book)
+            .then(() => {
+                res.status(200).json(humps.camelizeKeys(book));
             })
             .catch((err) => {
                 res.sendStatus(500);
             });
     })
     .delete((req, res) => {
-        let book;
+        var book;
 
         knex('books')
-            .select('name', 'author', 'genre', 'description', 'cover_url')
             .where('id', req.params.id)
             .then((books) => {
+                if (!books[0]) {
+                    res.sendStatus(404);
+                }
                 book = humps.camelizeKeys(books[0]);
             })
             .catch((err) => {
@@ -90,9 +97,9 @@ router.route('/books/:id')
 
         knex('books')
             .where('id', req.params.id)
-            .delete()
+            .del()
             .then(() => {
-                console.log(book);
+                delete book.id;
                 res.status(200).json(book);
             })
             .catch((err) => {
