@@ -169,14 +169,14 @@ suite('part5 routes favorites', () => {
     //     .expect(401, 'Unauthorized', done);
     // });
     //
-    // test('DELETE /favorites', (done) => {
-    //   request(server)
-    //     .del('/favorites')
-    //     .set('Accept', 'application/json')
-    //     .set('Content-Type', 'application/json')
-    //     .send({ bookId: 1 })
-    //     .expect('Content-Type', /plain/)
-    //     .expect(401, 'Unauthorized', done);
-    // });
+    test('DELETE /favorites', (done) => {
+      request(server)
+        .del('/favorites')
+        .set('Accept', 'application/json')
+        .set('Content-Type', 'application/json')
+        .send({ bookId: 1 })
+        .expect('Content-Type', /plain/)
+        .expect(401, 'Unauthorized', done);
+    });
   });
 });

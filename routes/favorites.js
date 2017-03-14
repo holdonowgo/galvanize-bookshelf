@@ -6,6 +6,7 @@ const express = require('express');
 const router = express.Router();
 const knex = require('../knex.js');
 const humps = require('humps');
+const jwt = require('jsonwebtoken');
 
 // YOUR CODE HERE
 router.route('/favorites')
@@ -45,6 +46,13 @@ router.route('/favorites')
             });
     })
     .delete((req, res) => {
+        jwt.verify(req.cookies.token, process.env.JWT_KEY, (err, payload) => {
+            if (err) {
+                res.set('Content-Type', 'text/plain');
+                res.status(401).send('Unauthorized');
+            }
+        });
+
         var favorite;
 
         knex('favorites')
