@@ -85,33 +85,33 @@ suite('part5 routes favorites', () => {
         .expect(200, 'false', done);
     });
 
-    // test('POST /favorites', (done) => {
-    //   agent
-    //     .post('/favorites')
-    //     .set('Accept', 'application/json')
-    //     .set('Content-Type', 'application/json')
-    //     .send({ bookId: 2 })
-    //     .expect('Content-Type', /json/)
-    //     .expect((res) => {
-    //       delete res.body.createdAt;
-    //       delete res.body.updatedAt;
-    //     })
-    //     .expect(200, { id: 2, bookId: 2, userId: 1 }, done);
-    // });
+    test('POST /favorites', (done) => {
+      agent
+        .post('/favorites')
+        .set('Accept', 'application/json')
+        .set('Content-Type', 'application/json')
+        .send({ bookId: 2 })
+        .expect('Content-Type', /json/)
+        .expect((res) => {
+          delete res.body.createdAt;
+          delete res.body.updatedAt;
+        })
+        .expect(200, { id: 2, bookId: 2, userId: 1 }, done);
+    });
 
-    // test('DELETE /favorites', (done) => {
-    //   agent
-    //     .delete('/favorites')
-    //     .set('Accept', 'application/json')
-    //     .set('Content-Type', 'application/json')
-    //     .send({ bookId: 1 })
-    //     .expect('Content-Type', /json/)
-    //     .expect((res) => {
-    //       delete res.body.createdAt;
-    //       delete res.body.updatedAt;
-    //     })
-    //     .expect(200, { bookId: 1, userId: 1 }, done);
-    // });
+    test('DELETE /favorites', (done) => {
+      agent
+        .delete('/favorites')
+        .set('Accept', 'application/json')
+        .set('Content-Type', 'application/json')
+        .send({ bookId: 1 })
+        .expect('Content-Type', /json/)
+        .expect((res) => {
+          delete res.body.createdAt;
+          delete res.body.updatedAt;
+        })
+        .expect(200, { bookId: 1, userId: 1 }, done);
+    });
   });
 
   suite('without token', () => {

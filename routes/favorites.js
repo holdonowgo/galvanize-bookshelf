@@ -29,6 +29,49 @@ router.route('/favorites')
                 res.sendStatus(500);
             });
     })
+    .post((req, res) => {
+        var favorite = {
+            book_id: req.body.bookId,
+            user_id: 1
+        };
+        knex('favorites')
+            .insert(favorite, '*')
+            .then((insertedFavorite) => {
+                res.set('Content-Type', 'application/json');
+                res.status(200).json(humps.camelizeKeys(insertedFavorite[0]));
+            })
+            .catch((err) => {
+                res.sendStatus(500);
+            });
+    })
+    .delete((req, res) => {
+        var favorite;
+
+        knex('favorites')
+            .where('book_id', req.body.bookId)
+            .andWhere('user_id', 1)
+            .then((favorites) => {
+                if (!favorites[0]) {
+                    res.sendStatus(404);
+                }
+                favorite = humps.camelizeKeys(favorites[0]);
+            })
+            .catch((err) => {
+                res.sendStatus(500);
+            });
+
+        knex('favorites')
+            .where('id', req.body.bookId)
+            .del()
+            .then(() => {
+                delete favorite.id;
+                res.set('Content-Type', 'application/json');
+                res.status(200).json(favorite);
+            })
+            .catch((err) => {
+                res.sendStatus(500);
+            });
+    });
 router.route('/favorites/check')
     .get((req, res) => {
         knex('favorites')
