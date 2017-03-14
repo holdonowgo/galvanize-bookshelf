@@ -29,10 +29,10 @@ router.route('/favorites')
                 res.sendStatus(500);
             });
     })
-router.route('/favorites/check?bookId={id}')
+router.route('/favorites/check')
     .get((req, res) => {
         knex('favorites')
-            .where('book_id', req.query.params.id)
+            .where('book_id', req.query.bookId)
             .then((favorites) => {
                 if (favorites.length > 0) {
                     res.set('Content-Type', 'application/json');
