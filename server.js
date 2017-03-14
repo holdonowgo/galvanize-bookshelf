@@ -25,7 +25,7 @@ switch (app.get('env')) {
   default:
 }
 
-app.use(bodyParser.json());
+app.use(bodyParser.json());// check docs
 app.use(cookieParser());
 
 const path = require('path');
