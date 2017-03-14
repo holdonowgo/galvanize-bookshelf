@@ -11,8 +11,13 @@ const jwt = require('jsonwebtoken');
 // YOUR CODE HERE
 router.route('/favorites')
     .get((req, res) => {
-        //status code 200
-        //select * from drivers
+        jwt.verify(req.cookies.token, process.env.JWT_KEY, (err, payload) => {
+            if (err) {
+                res.set('Content-Type', 'text/plain');
+                return res.status(401).send('Unauthorized');
+            }
+        });
+
         knex('favorites')
             .join('users', 'users.id', '=', 'favorites.user_id')
             .join('books', 'books.id', '=', 'favorites.book_id')
@@ -24,13 +29,20 @@ router.route('/favorites')
                     delete favorite.hashed_password;
                 }
                 res.set('Content-Type', 'application/json');
-                res.status(200).send(humps.camelizeKeys(favorites));
+                return res.status(200).send(humps.camelizeKeys(favorites));
             })
             .catch((err) => {
-                res.sendStatus(500);
+                return res.sendStatus(500);
             });
     })
     .post((req, res) => {
+        jwt.verify(req.cookies.token, process.env.JWT_KEY, (err, payload) => {
+            if (err) {
+                res.set('Content-Type', 'text/plain');
+                return res.status(401).send('Unauthorized');
+            }
+        });
+
         var favorite = {
             book_id: req.body.bookId,
             user_id: 1
@@ -39,17 +51,17 @@ router.route('/favorites')
             .insert(favorite, '*')
             .then((insertedFavorite) => {
                 res.set('Content-Type', 'application/json');
-                res.status(200).json(humps.camelizeKeys(insertedFavorite[0]));
+                return res.status(200).json(humps.camelizeKeys(insertedFavorite[0]));
             })
             .catch((err) => {
-                res.sendStatus(500);
+                return res.sendStatus(500);
             });
     })
     .delete((req, res) => {
         jwt.verify(req.cookies.token, process.env.JWT_KEY, (err, payload) => {
             if (err) {
                 res.set('Content-Type', 'text/plain');
-                res.status(401).send('Unauthorized');
+                return res.status(401).send('Unauthorized');
             }
         });
 
@@ -60,12 +72,12 @@ router.route('/favorites')
             .andWhere('user_id', 1)
             .then((favorites) => {
                 if (!favorites[0]) {
-                    res.sendStatus(404);
+                    return res.sendStatus(404);
                 }
                 favorite = humps.camelizeKeys(favorites[0]);
             })
             .catch((err) => {
-                res.sendStatus(500);
+                return res.sendStatus(500);
             });
 
         knex('favorites')
@@ -74,23 +86,30 @@ router.route('/favorites')
             .then(() => {
                 delete favorite.id;
                 res.set('Content-Type', 'application/json');
-                res.status(200).json(favorite);
+                return res.status(200).json(favorite);
             })
             .catch((err) => {
-                res.sendStatus(500);
+                return res.sendStatus(500);
             });
     });
 router.route('/favorites/check')
     .get((req, res) => {
+        jwt.verify(req.cookies.token, process.env.JWT_KEY, (err, payload) => {
+            if (err) {
+                res.set('Content-Type', 'text/plain');
+                return res.status(401).send('Unauthorized');
+            }
+        });
+
         knex('favorites')
             .where('book_id', req.query.bookId)
             .then((favorites) => {
                 if (favorites.length > 0) {
                     res.set('Content-Type', 'application/json');
-                    res.status(200).json(true);
+                    return res.status(200).json(true);
                 } else {
                     res.set('Content-Type', 'application/json');
-                    res.status(200).json(false);
+                    return res.status(200).json(false);
                 }
             })
     })

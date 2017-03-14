@@ -135,40 +135,40 @@ suite('part5 routes favorites', () => {
         });
     });
 
-    // test('GET /favorites', (done) => {
-    //   request(server)
-    //     .get('/favorites')
-    //     .set('Accept', 'application/json')
-    //     .expect('Content-Type', /plain/)
-    //     .expect(401, 'Unauthorized', done);
-    // });
-    //
-    // test('GET /favorites/check?bookId=1', (done) => {
-    //   request(server)
-    //     .get('/favorites/check?bookId=1')
-    //     .set('Accept', 'application/json')
-    //     .expect('Content-Type', /plain/)
-    //     .expect(401, 'Unauthorized', done);
-    // });
-    //
-    // test('GET /favorites/check?bookId=2', (done) => {
-    //   request(server)
-    //     .get('/favorites/check?bookId=2')
-    //     .set('Accept', 'application/json')
-    //     .expect('Content-Type', /plain/)
-    //     .expect(401, 'Unauthorized', done);
-    // });
-    //
-    // test('POST /favorites', (done) => {
-    //   request(server)
-    //     .post('/favorites')
-    //     .set('Accept', 'application/json')
-    //     .set('Content-Type', 'application/json')
-    //     .send({ bookId: 2 })
-    //     .expect('Content-Type', /plain/)
-    //     .expect(401, 'Unauthorized', done);
-    // });
-    //
+    test('GET /favorites', (done) => {
+      request(server)
+        .get('/favorites')
+        .set('Accept', 'application/json')
+        .expect('Content-Type', /plain/)
+        .expect(401, 'Unauthorized', done);
+    });
+
+    test('GET /favorites/check?bookId=1', (done) => {
+      request(server)
+        .get('/favorites/check?bookId=1')
+        .set('Accept', 'application/json')
+        .expect('Content-Type', /plain/)
+        .expect(401, 'Unauthorized', done);
+    });
+
+    test('GET /favorites/check?bookId=2', (done) => {
+      request(server)
+        .get('/favorites/check?bookId=2')
+        .set('Accept', 'application/json')
+        .expect('Content-Type', /plain/)
+        .expect(401, 'Unauthorized', done);
+    });
+
+    test('POST /favorites', (done) => {
+      request(server)
+        .post('/favorites')
+        .set('Accept', 'application/json')
+        .set('Content-Type', 'application/json')
+        .send({ bookId: 2 })
+        .expect('Content-Type', /plain/)
+        .expect(401, 'Unauthorized', done);
+    });
+    
     test('DELETE /favorites', (done) => {
       request(server)
         .del('/favorites')
