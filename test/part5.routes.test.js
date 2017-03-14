@@ -70,13 +70,13 @@ suite('part5 routes favorites', () => {
       /* eslint-enable max-len */
     });
 
-    // test('GET /favorites/check?bookId=1', (done) => {
-    //   agent
-    //     .get('/favorites/check?bookId=1')
-    //     .set('Accept', 'application/json')
-    //     .expect('Content-Type', /json/)
-    //     .expect(200, 'true', done);
-    // });
+    test('GET /favorites/check?bookId=1', (done) => {
+      agent
+        .get('/favorites/check?bookId=1')
+        .set('Accept', 'application/json')
+        .expect('Content-Type', /json/)
+        .expect(200, 'true', done);
+    });
 
     // test('GET /favorites/check?bookId=2', (done) => {
     //   agent

@@ -29,5 +29,19 @@ router.route('/favorites')
                 res.sendStatus(500);
             });
     })
+router.route('/favorites/check?bookId={id}')
+    .get((req, res) => {
+        knex('favorites')
+            .where('book_id', req.query.params.id)
+            .then((favorites) => {
+                if (favorites.length > 0) {
+                    res.set('Content-Type', 'application/json');
+                    res.status(200).json(true);
+                } else {
+                    res.set('Content-Type', 'application/json');
+                    res.status(200).json(false);
+                }
+            })
+    })
 
 module.exports = router;
