@@ -78,12 +78,12 @@ suite('part5 routes favorites', () => {
         .expect(200, 'true', done);
     });
 
-    // test('GET /favorites/check?bookId=2', (done) => {
-    //   agent
-    //     .get('/favorites/check?bookId=2')
-    //     .set('Accept', 'application/json')
-    //     .expect(200, 'false', done);
-    // });
+    test('GET /favorites/check?bookId=2', (done) => {
+      agent
+        .get('/favorites/check?bookId=2')
+        .set('Accept', 'application/json')
+        .expect(200, 'false', done);
+    });
 
     // test('POST /favorites', (done) => {
     //   agent
