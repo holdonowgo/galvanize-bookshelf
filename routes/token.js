@@ -12,6 +12,8 @@ const bcrypt = require('bcrypt-as-promised');
 const knex = require('../knex.js');
 const humps = require('humps');
 const jwt = require('jsonwebtoken');
+const ev = require('express-validation');
+const validations = require("../validations/token");
 
 router.route('/token')
     .get((req, res, next) => {
@@ -32,7 +34,7 @@ router.route('/token')
             }
         });
     })
-    .post((req, res, next) => {
+    .post(ev(validations.post), (req, res, next) => {
         knex('users')
             .where('email', req.body.email)
             .first()

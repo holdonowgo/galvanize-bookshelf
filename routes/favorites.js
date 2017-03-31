@@ -7,6 +7,8 @@ const router = express.Router();
 const knex = require('../knex.js');
 const humps = require('humps');
 const jwt = require('jsonwebtoken');
+const ev = require('express-validation');
+const validations = require("../validations/favorites");
 
 // YOUR CODE HERE
 router.route('/favorites')
@@ -15,27 +17,29 @@ router.route('/favorites')
             if (err) {
                 res.set('Content-Type', 'text/plain');
                 return res.status(401).send('Unauthorized');
+            } else {
+                knex('favorites')
+                    .join('users', 'users.id', '=', 'favorites.user_id')
+                    .join('books', 'books.id', '=', 'favorites.book_id')
+                    .then((favorites) => {
+                        for (let favorite of favorites) {
+                            delete favorite.first_name;
+                            delete favorite.last_name;
+                            delete favorite.email;
+                            delete favorite.hashed_password;
+                        }
+                        res.set('Content-Type', 'application/json');
+                        return res.status(200).send(humps.camelizeKeys(favorites));
+                    })
+                    .catch((err) => {
+                        return res.sendStatus(500);
+                    });
             }
         });
-
-        knex('favorites')
-            .join('users', 'users.id', '=', 'favorites.user_id')
-            .join('books', 'books.id', '=', 'favorites.book_id')
-            .then((favorites) => {
-                for (let favorite of favorites) {
-                    delete favorite.first_name;
-                    delete favorite.last_name;
-                    delete favorite.email;
-                    delete favorite.hashed_password;
-                }
-                res.set('Content-Type', 'application/json');
-                return res.status(200).send(humps.camelizeKeys(favorites));
-            })
-            .catch((err) => {
-                return res.sendStatus(500);
-            });
     })
-    .post((req, res) => {
+    .post(ev(validations.post), (req, res) => {
+        console.log('req.cookies.token:', req.cookies.token);
+        console.log('process.env.JWT_KEY:', process.env.JWT_KEY);
         jwt.verify(req.cookies.token, process.env.JWT_KEY, (err, payload) => {
             if (err) {
                 res.set('Content-Type', 'text/plain');
@@ -44,8 +48,8 @@ router.route('/favorites')
         });
 
         var favorite = {
-            book_id: req.body.bookId,
-            user_id: 1
+            bookId: req.body.bookId,
+            userId: 1
         };
         knex('favorites')
             .insert(favorite, '*')
@@ -62,35 +66,35 @@ router.route('/favorites')
             if (err) {
                 res.set('Content-Type', 'text/plain');
                 return res.status(401).send('Unauthorized');
+            } else {
+                var favorite;
+
+                knex('favorites')
+                    .where('book_id', req.body.bookId)
+                    .andWhere('user_id', 1)
+                    .then((favorites) => {
+                        if (!favorites[0]) {
+                            return res.sendStatus(404);
+                        }
+                        favorite = humps.camelizeKeys(favorites[0]);
+                    })
+                    .catch((err) => {
+                        return res.sendStatus(500);
+                    });
+
+                knex('favorites')
+                    .where('id', req.body.bookId)
+                    .del()
+                    .then(() => {
+                        delete favorite.id;
+                        res.set('Content-Type', 'application/json');
+                        return res.status(200).json(favorite);
+                    })
+                    .catch((err) => {
+                        return res.sendStatus(500);
+                    });
             }
         });
-
-        var favorite;
-
-        knex('favorites')
-            .where('book_id', req.body.bookId)
-            .andWhere('user_id', 1)
-            .then((favorites) => {
-                if (!favorites[0]) {
-                    return res.sendStatus(404);
-                }
-                favorite = humps.camelizeKeys(favorites[0]);
-            })
-            .catch((err) => {
-                return res.sendStatus(500);
-            });
-
-        knex('favorites')
-            .where('id', req.body.bookId)
-            .del()
-            .then(() => {
-                delete favorite.id;
-                res.set('Content-Type', 'application/json');
-                return res.status(200).json(favorite);
-            })
-            .catch((err) => {
-                return res.sendStatus(500);
-            });
     });
 router.route('/favorites/check')
     .get((req, res) => {
@@ -98,20 +102,20 @@ router.route('/favorites/check')
             if (err) {
                 res.set('Content-Type', 'text/plain');
                 return res.status(401).send('Unauthorized');
+            } else {
+                knex('favorites')
+                    .where('book_id', req.query.bookId)
+                    .then((favorites) => {
+                        if (favorites.length > 0) {
+                            res.set('Content-Type', 'application/json');
+                            return res.status(200).json(true);
+                        } else {
+                            res.set('Content-Type', 'application/json');
+                            return res.status(200).json(false);
+                        }
+                    })
             }
         });
-
-        knex('favorites')
-            .where('book_id', req.query.bookId)
-            .then((favorites) => {
-                if (favorites.length > 0) {
-                    res.set('Content-Type', 'application/json');
-                    return res.status(200).json(true);
-                } else {
-                    res.set('Content-Type', 'application/json');
-                    return res.status(200).json(false);
-                }
-            })
     })
 
 module.exports = router;

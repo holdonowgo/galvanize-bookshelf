@@ -10,6 +10,8 @@ const router = express.Router();
 // YOUR CODE HERE
 const knex = require('../knex.js');
 const humps = require('humps');
+const ev = require('express-validation');
+const validations = require("../validations/books");
 
 router.route('/books')
     .get((req, res) => {
@@ -19,13 +21,13 @@ router.route('/books')
             .orderBy('title')
             .then((books) => {
                 books = humps.camelizeKeys(books);
-                res.send(books);
+                return res.send(books);
             })
             .catch((err) => {
                 res.sendStatus(500);
             });
     })
-    .post((req, res) => {
+    .post(ev(validations.post), (req, res) => {
         var book = {
             author: req.body.author,
             cover_url: req.body.coverUrl,
@@ -35,8 +37,8 @@ router.route('/books')
         };
         knex('books')
             .insert(book, '*')
-            .then((insertedBook) => {
-                res.status(200).json(humps.camelizeKeys(insertedBook[0]));
+            .then((insertedBooks) => {
+                return res.status(200).json(humps.camelizeKeys(insertedBooks[0]));
             })
             .catch((err) => {
                 res.sendStatus(500);
@@ -74,7 +76,7 @@ router.route('/books/:id')
             .where('id', req.params.id)
             .update(book)
             .then(() => {
-                res.status(200).json(humps.camelizeKeys(book));
+                return res.status(200).json(humps.camelizeKeys(book));
             })
             .catch((err) => {
                 res.sendStatus(500);
@@ -100,7 +102,7 @@ router.route('/books/:id')
             .del()
             .then(() => {
                 delete book.id;
-                res.status(200).json(book);
+                return res.status(200).json(book);
             })
             .catch((err) => {
                 res.sendStatus(500);
