@@ -37,29 +37,38 @@ router.route('/favorites')
             }
         });
     })
-    .post(ev(validations.post), (req, res) => {
-        console.log('req.cookies.token:', req.cookies.token);
-        console.log('process.env.JWT_KEY:', process.env.JWT_KEY);
+    .post((req, res) => {
         jwt.verify(req.cookies.token, process.env.JWT_KEY, (err, payload) => {
             if (err) {
                 res.set('Content-Type', 'text/plain');
                 return res.status(401).send('Unauthorized');
+            } else {
+                let favorite = {
+                    book_id: req.body.bookId,
+                    user_id: payload.userId
+                }
+                knex('books').first()
+                    .where('id', req.body.bookId)
+                    .then((book) => {
+                        if (book === undefined) {
+                            res.set("Content-Type", "text/plain");
+                            return res.status(404).send('Book not found');
+                        } else {
+                            knex('favorites').insert(favorite).returning('*')
+                                .then((book) => {
+                                    res.status(200);
+                                    res.send(humps.camelizeKeys(book[0]));
+                                })
+                                .catch((err) => {
+                                    console.error(err);
+                                })
+                        }
+                    })
+                    .catch((err) => {
+                        console.error(err);
+                    })
             }
         });
-
-        var favorite = {
-            bookId: req.body.bookId,
-            userId: 1
-        };
-        knex('favorites')
-            .insert(favorite, '*')
-            .then((insertedFavorite) => {
-                res.set('Content-Type', 'application/json');
-                return res.status(200).json(humps.camelizeKeys(insertedFavorite[0]));
-            })
-            .catch((err) => {
-                return res.sendStatus(500);
-            });
     })
     .delete((req, res) => {
         jwt.verify(req.cookies.token, process.env.JWT_KEY, (err, payload) => {

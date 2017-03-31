@@ -4,13 +4,11 @@ const joi = require("joi");
 
 module.exports.post = {
     body: {
-        userId: joi.string()
+        userId: joi.number()
             .label('user id')
-            .required()
-            .trim(),
-        bookId: joi.string()
+            .required(),
+        bookId: joi.number()
             .label('book id')
             .required()
-            .trim()
     }
 };
